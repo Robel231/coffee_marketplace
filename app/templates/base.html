@@ -14,14 +14,21 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.register') }}">Register</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.login') }}">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.add_product') }}">Add Product</a></li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role == 'farmer' %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.add_product') }}">Add Product</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.login') }}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.register') }}">Register</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+    
+    
     <div class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

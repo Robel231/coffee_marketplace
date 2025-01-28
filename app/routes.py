@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from app.models import User, Product, Order
+from app.models import User, Product, Order, CartItem
 from app.forms import RegistrationForm, LoginForm, ProductForm
 
 bp = Blueprint('main', __name__)
@@ -45,6 +45,11 @@ def logout():
 @bp.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
+    # Restrict access to farmers only
+    if current_user.role != 'farmer':
+        flash('You do not have permission to add products!', 'danger')
+        return redirect(url_for('main.home'))
+    
     form = ProductForm()
     if form.validate_on_submit():
         product = Product(
@@ -57,6 +62,7 @@ def add_product():
         db.session.commit()
         flash('Product added successfully!', 'success')
         return redirect(url_for('main.home'))
+    
     return render_template('add_product.html', form=form)
 @bp.route('/products')
 def products():
@@ -80,12 +86,20 @@ def cart():
 def add_to_cart(product_id):
     product = Product.query.get_or_404(product_id)
     quantity = int(request.form.get('quantity', 1))
+    
+    # Check if the item is already in the cart
     cart_item = CartItem.query.filter_by(buyer_id=current_user.id, product_id=product_id).first()
     if cart_item:
         cart_item.quantity += quantity
     else:
-        cart_item = CartItem(buyer_id=current_user.id, product_id=product_id, quantity=quantity)
+        # Add new item to the cart
+        cart_item = CartItem(
+            buyer_id=current_user.id,
+            product_id=product_id,
+            quantity=quantity
+        )
         db.session.add(cart_item)
+    
     db.session.commit()
     flash('Product added to cart!', 'success')
     return redirect(url_for('main.cart'))
