@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-center mb-4">Dashboard</h2>
+        {% if current_user.role == 'farmer' %}
+        <h3>Your Products</h3>
+        <a href="{{ url_for('main.add_product') }}" class="btn btn-success mb-3">Add New Product</a>
+        <div class="row">
+            {% for product in current_user.products %}
+            <div class="col-md-4">
+                <div class="card product-card">
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" class="card-img-top" alt="{{ product.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                        <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                        <a href="{{ url_for('main.product_detail', product_id=product.id) }}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <h3>Your Orders</h3>
+        <div class="row">
+            {% for order in current_user.orders %}
+            <div class="col-md-4">
+                <div class="card product-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ order.product.name }}</h5>
+                        <p class="card-text"><strong>Quantity:</strong> {{ order.quantity }}</p>
+                        <p class="card-text"><strong>Total Price:</strong> ${{ order.total_price }}</p>
+                        <p class="card-text"><strong>Status:</strong> {{ order.status }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
