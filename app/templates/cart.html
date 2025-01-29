@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <h1 class="text-center mb-4">Your Cart</h1>
+<div class="container">
+    <h2 class="text-center my-4">Your Cart</h2>
+    
     {% if cart_items %}
     <table class="table">
         <thead>
@@ -28,10 +29,21 @@
             {% endfor %}
         </tbody>
     </table>
+
     <div class="text-end">
         <h4>Total: ${{ total_price }}</h4>
-        <a href="{{ url_for('main.checkout') }}" class="btn btn-success">Checkout</a>
+        
+        <!-- Stripe Payment Button -->
+        <form action="{{ url_for('main.stripe_checkout') }}" method="POST">
+            <button type="submit" class="btn btn-primary">Pay with Stripe</button>
+        </form>
+
+        <!-- PayPal Payment Button -->
+        <form action="{{ url_for('main.paypal_checkout') }}" method="POST">
+            <button type="submit" class="btn btn-success mt-2">Pay with PayPal</button>
+        </form>
     </div>
+
     {% else %}
     <p class="text-center">Your cart is empty.</p>
     {% endif %}
